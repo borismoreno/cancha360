@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+    /* 🎨 Colores personalizados */
+    --color-brand: #0FA958;
+    --color-brand-dark: #0C7C43;
+    --color-neutral-light: #F3F4F6;
+    --color-neutral-medium: #9CA3AF;
+    --color-neutral-dark: #1F2937;
+    --color-accent: #2563EB;
+    --color-accent-dark: #1E40AF;
+
+    /* 🟢 Estados */
+    --color-state-played: #3B82F6;
+    --color-state-pending: #6B7280;
+    --color-state-suspended: #CA8A04;
+    --color-state-wo: #DC2626;
+    --color-state-reprogrammed: #8B5CF6;
+}
