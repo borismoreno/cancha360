@@ -2,6 +2,7 @@ import {
     createContext,
     useContext,
     useEffect,
+    useRef,
     useState,
     type ReactNode,
 } from "react";
@@ -39,76 +40,112 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [profile, setProfile] = useState<OrganizerProfile | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // ----------------------------------------------------------------------
-    // 1) Restaurar sesión inicial (IMPORTANTE: getUser() para SPA)
-    // ----------------------------------------------------------------------
-    useEffect(() => {
-        const loadSession = async () => {
-            console.log("🔍 [Auth] Restaurando sesión inicial…");
+    // Guardas para evitar carreras y fetchs duplicados
+    const initialRestoreDone = useRef(false);
+    const lastFetchedId = useRef<string | null>(null);
 
-            const { data, error } = await supabase.auth.getUser();
+    // Función auxiliar para cargar el perfil
+    const loadProfile = async (userId: string) => {
+        try {
+            const { data: profileData, error } = await supabase
+                .from("organizers")
+                .select("*")
+                .eq("id", userId)
+                .maybeSingle();
 
             if (error) {
-                console.error("❌ [Auth] Error getUser:", error.message);
+                console.error("❌ [Auth] Error cargando perfil:", error);
+                return null;
             }
 
-            const sessionUser = data?.user ?? null;
-            setUser(sessionUser);
+            lastFetchedId.current = profileData?.id ?? null;
+            return profileData;
+        } catch (err) {
+            console.error("❌ [Auth] Excepción cargando perfil:", err);
+            return null;
+        }
+    };
 
-            if (sessionUser) {
-                const { data: profileData } = await supabase
-                    .from("organizers")
-                    .select("*")
-                    .eq("id", sessionUser.id)
-                    .maybeSingle();
+    // Setup del listener de auth PRIMERO
+    useEffect(() => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
 
-                setProfile(profileData ?? null);
+            const currentUser = session?.user ?? null;
+
+            // Evitar ejecutar fetchs hasta completar la restauración inicial
+            if (!initialRestoreDone.current) {
+                // manejar solo sign out pre-inicialización para limpiar estado
+                if (event === "SIGNED_OUT") {
+                    setUser(null);
+                    setProfile(null);
+                    setLoading(false);
+                }
+                return;
+            }
+
+            setUser(currentUser);
+
+            if (currentUser) {
+                // evitar fetch duplicado si ya se obtuvo para el mismo id
+                if (lastFetchedId.current !== currentUser.id) {
+                    const profileData = await loadProfile(currentUser.id);
+                    setProfile(profileData ?? null);
+                } else {
+                    console.log("ℹ️ [Auth] Perfil ya obtenido para id=", currentUser.id);
+                }
             } else {
                 setProfile(null);
             }
 
             setLoading(false);
-        };
-
-        loadSession();
-    }, []);
-
-    // ----------------------------------------------------------------------
-    // 2) Listener para login / logout / refresh tokens
-    // ----------------------------------------------------------------------
-    useEffect(() => {
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log("⚡ [Auth] Evento:", event);
-
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
-
-            if (currentUser) {
-                const { data: profileData } = await supabase
-                    .from("organizers")
-                    .select("*")
-                    .eq("id", currentUser.id)
-                    .maybeSingle();
-
-                setProfile(profileData ?? null);
-            } else {
-                setProfile(null);
-            }
         });
 
         return () => subscription.unsubscribe();
     }, []);
 
-    // ----------------------------------------------------------------------
-    // 3) Logout
-    // ----------------------------------------------------------------------
+    // Restaurar sesión inicial
+    useEffect(() => {
+        const restoreSession = async () => {
+
+            try {
+                const { data, error } = await supabase.auth.getUser();
+
+                if (error) {
+                    console.error("❌ [Auth] Error getUser:", error.message);
+                    setLoading(false);
+                    return;
+                }
+
+                if (data?.user) {
+                    setUser(data.user);
+                    const profileData = await loadProfile(data.user.id);
+                    setProfile(profileData ?? null);
+                }
+            } catch (err) {
+                console.error("❌ [Auth] Excepción restaurando sesión:", err);
+            } finally {
+                setLoading(false);
+                initialRestoreDone.current = true; // marcar que la restauración inicial terminó
+            }
+        };
+
+        restoreSession();
+    }, []);
+
+    // Logout
     const logout = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        setProfile(null);
-        setLoading(false);
+        try {
+            await supabase.auth.signOut();
+        } catch (err) {
+            console.error("❌ [Auth] Error en logout:", err);
+        } finally {
+            setUser(null);
+            setProfile(null);
+            // Limpiar el id fetchado para forzar reload al volver a iniciar sesión
+            lastFetchedId.current = null;
+        }
     };
 
     const value: AuthContextType = {

@@ -9,7 +9,7 @@ const NotFound = () => {
                 <div className="bg-white rounded-xl shadow-md p-8 md:p-12">
                     {/* Icon */}
                     <div className="flex items-center justify-center mb-6">
-                        <div className="w-20 h-20 bg-brand bg-opacity-10 rounded-full flex items-center justify-center">
+                        <div className="w-20 h-20 bg-brand/10 rounded-full flex items-center justify-center">
                             <AlertCircleIcon className="text-brand" size={48} />
                         </div>
                     </div>

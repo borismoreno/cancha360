@@ -9,6 +9,8 @@ import { Login } from "../pages/Login";
 import { SignUp } from "../pages/SignUp";
 import NotFound from "../pages/NotFound";
 import { SuperAdminDashboard } from "../pages/superadmin/SuperAdminDashboard";
+import { OrganizerRoute } from "./OrganizarRoute";
+import AccessCodes from "../pages/superadmin/AccessCodes";
 
 export const AppRouter = () => {
     return (
@@ -19,14 +21,18 @@ export const AppRouter = () => {
                 <Route path="/signup" element={<SignUp />} />
             </Route>
 
-            {/* Rutas privadas (organizador autenticado) */}
+            {/* Rutas organizador */}
             <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                {/* aquí irían /partidos, /equipos, /configuracion, etc. */}
+                <Route element={<OrganizerRoute />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                </Route>
+            </Route>
 
-                {/* Rutas sólo Superadmin */}
+            {/* Rutas sólo Superadmin */}
+            <Route element={<ProtectedRoute />}>
                 <Route element={<SuperAdminRoute />}>
                     <Route path="/superadmin" element={<SuperAdminDashboard />} />
+                    <Route path="/superadmin/codigos" element={<AccessCodes />} />
                 </Route>
             </Route>
 

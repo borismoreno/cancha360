@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Input from "../components/UI/Input"
 import Button from "../components/UI/Button"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { login } from "../services/authService"
 
 const schema = yup.object({
@@ -17,6 +17,7 @@ const schema = yup.object({
 type LoginFormData = yup.InferType<typeof schema>
 
 export const Login = () => {
+    const navigate = useNavigate()
     const {
         register,
         handleSubmit,
@@ -28,9 +29,15 @@ export const Login = () => {
 
     const onSubmit = async (data: LoginFormData) => {
         try {
-            console.log('Login data:', data)
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            await login(data.email, data.password)
+            const result = await login(data.email, data.password)
+            if (result.success) {
+                navigate('/dashboard')
+            } else {
+                setError('password', {
+                    type: 'manual',
+                    message: result.error || 'Error al iniciar sesión',
+                })
+            }
             // const userHasActiveAccess = false
             // if (!userHasActiveAccess) {
             //     navigate('/activate')
