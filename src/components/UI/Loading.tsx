@@ -11,7 +11,7 @@ interface LoadingProps {
  * <Loading fullScreen />
  * <Loading message="Guardando cambios…" fullScreen />
  */
-const Loading = ({ message, fullScreen = false }: LoadingProps) => {
+const Loading = ({ message = 'Cargando...', fullScreen = false }: LoadingProps) => {
     const containerClasses = fullScreen
         ? 'fixed inset-0 bg-black/30 flex items-center justify-center z-50'
         : 'flex items-center justify-center py-8'

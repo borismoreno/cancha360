@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
 import { SuperAdminRoute } from "./SuperAdminRoute";
@@ -11,6 +11,7 @@ import NotFound from "../pages/NotFound";
 import { SuperAdminDashboard } from "../pages/superadmin/SuperAdminDashboard";
 import { OrganizerRoute } from "./OrganizarRoute";
 import AccessCodes from "../pages/superadmin/AccessCodes";
+import Organizers from "../pages/superadmin/Organizers";
 
 export const AppRouter = () => {
     return (
@@ -33,8 +34,11 @@ export const AppRouter = () => {
                 <Route element={<SuperAdminRoute />}>
                     <Route path="/superadmin" element={<SuperAdminDashboard />} />
                     <Route path="/superadmin/codigos" element={<AccessCodes />} />
+                    <Route path="/superadmin/organizadores" element={<Organizers />} />
                 </Route>
             </Route>
+
+            <Route path="/" element={<Navigate to='/dashboard' />} />
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
