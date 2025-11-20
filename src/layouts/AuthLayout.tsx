@@ -12,7 +12,7 @@ export const AuthLayout = ({
 }: AuthLayoutProps) => {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-neutral-light">
-            <div className="w-full max-w-md">
+            <div className="w-full md:max-w-2xl max-w-md">
                 {logo && (
                     <div className="text-center mb-6">
                         <h1 className="text-3xl font-bold text-brand">Cancha360</h1>

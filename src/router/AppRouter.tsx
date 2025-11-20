@@ -12,6 +12,9 @@ import Organizers from "../pages/superadmin/Organizers";
 import Activate from "../pages/accesscode/Activate";
 import Request from "../pages/accesscode/Request";
 import TournamentData from "../pages/onboarding/TournamentData";
+import TournamentRules from "../pages/onboarding/TournamentRules";
+import TournamentTeams from "../pages/onboarding/TournamentTeams";
+import TournamentFixture from "../pages/onboarding/TournamentFixture";
 
 export const AppRouter = () => {
     const { loading } = useRouteGuard();
@@ -25,21 +28,10 @@ export const AppRouter = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/activacion" element={<Activate />} />
             <Route path="/solicitar-codigo" element={<Request />} />
-            {/* <Route element={<PublicRoute />}>
-            </Route> */}
-
-            {/* Rutas organizador */}
-            {/* <Route element={<ProtectedRoute />}>
-                <Route element={<OrganizerRoute />}>
-                </Route>
-            </Route> */}
-
-            {/* Rutas sólo Superadmin */}
-            {/* <Route element={<ProtectedRoute />}>
-                <Route element={<SuperAdminRoute />}>
-                </Route>
-            </Route> */}
             <Route path="/onboarding/campeonato/datos" element={<TournamentData />} />
+            <Route path="/onboarding/campeonato/reglas" element={<TournamentRules />} />
+            <Route path="/onboarding/campeonato/equipos" element={<TournamentTeams />} />
+            <Route path="/onboarding/campeonato/fixture" element={<TournamentFixture />} />
             <Route path="/superadmin" element={<SuperAdminDashboard />} />
             <Route path="/superadmin/codigos" element={<AccessCodes />} />
             <Route path="/superadmin/organizadores" element={<Organizers />} />
