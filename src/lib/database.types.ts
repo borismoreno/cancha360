@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_code_requests: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          organization_name: string | null
+          phone: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          organization_name?: string | null
+          phone: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          organization_name?: string | null
+          phone?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       access_codes: {
         Row: {
           code: string
@@ -21,7 +54,6 @@ export type Database = {
           id: string
           is_used: boolean
           used_at: string | null
-          used_by: string | null
           used_by_email: string | null
         }
         Insert: {
@@ -30,7 +62,6 @@ export type Database = {
           id?: string
           is_used?: boolean
           used_at?: string | null
-          used_by?: string | null
           used_by_email?: string | null
         }
         Update: {
@@ -39,7 +70,6 @@ export type Database = {
           id?: string
           is_used?: boolean
           used_at?: string | null
-          used_by?: string | null
           used_by_email?: string | null
         }
         Relationships: []
@@ -49,6 +79,8 @@ export type Database = {
           created_at: string
           email: string
           full_name: string
+          has_active_code: boolean | null
+          has_active_tournament: boolean | null
           id: string
           is_active: boolean
           is_superadmin: boolean
@@ -59,6 +91,8 @@ export type Database = {
           created_at?: string
           email: string
           full_name: string
+          has_active_code?: boolean | null
+          has_active_tournament?: boolean | null
           id: string
           is_active?: boolean
           is_superadmin?: boolean
@@ -69,6 +103,8 @@ export type Database = {
           created_at?: string
           email?: string
           full_name?: string
+          has_active_code?: boolean | null
+          has_active_tournament?: boolean | null
           id?: string
           is_active?: boolean
           is_superadmin?: boolean
@@ -76,6 +112,59 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      tournaments: {
+        Row: {
+          avatar_url: string | null
+          category: string | null
+          created_at: string | null
+          has_finished: boolean | null
+          id: string
+          is_active: boolean | null
+          location: string | null
+          name: string
+          notes: string | null
+          organizer_id: string
+          public_slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          category?: string | null
+          created_at?: string | null
+          has_finished?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          organizer_id: string
+          public_slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          category?: string | null
+          created_at?: string | null
+          has_finished?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          organizer_id?: string
+          public_slug?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournaments_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "organizers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

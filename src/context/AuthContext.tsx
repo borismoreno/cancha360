@@ -7,27 +7,31 @@ import {
     type ReactNode,
 } from "react";
 import { supabase } from "../lib/supabase";
+import type { Database } from "../lib/database.types";
+
+type Organizer = Database["public"]["Tables"]["organizers"]["Row"];
 
 // ============================
 // Tipos
 // ============================
-export interface OrganizerProfile {
-    id: string;
-    full_name: string;
-    email: string;
-    organization_name: string | null;
-    is_active: boolean;
-    is_superadmin: boolean;
-    created_at: string;
-    updated_at: string;
-}
+// export interface OrganizerProfile {
+//     id: string;
+//     full_name: string;
+//     email: string;
+//     organization_name: string | null;
+//     is_active: boolean;
+//     is_superadmin: boolean;
+//     created_at: string;
+//     updated_at: string;
+// }
 
-interface AuthContextType {
+type AuthContextType = {
     user: any | null;
-    profile: OrganizerProfile | null;
+    profile: Organizer | null;
     loading: boolean;
     isAuthenticated: boolean;
     logout: () => Promise<void>;
+    restoreSession: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -37,7 +41,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 // ============================
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<any | null>(null);
-    const [profile, setProfile] = useState<OrganizerProfile | null>(null);
+    const [profile, setProfile] = useState<Organizer | null>(null);
     const [loading, setLoading] = useState(true);
 
     // Guardas para evitar carreras y fetchs duplicados
@@ -106,31 +110,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     // Restaurar sesión inicial
-    useEffect(() => {
-        const restoreSession = async () => {
+    const restoreSession = async () => {
 
-            try {
-                const { data, error } = await supabase.auth.getUser();
+        try {
+            const { data, error } = await supabase.auth.getUser();
 
-                if (error) {
-                    console.error("❌ [Auth] Error getUser:", error.message);
-                    setLoading(false);
-                    return;
-                }
-
-                if (data?.user) {
-                    setUser(data.user);
-                    const profileData = await loadProfile(data.user.id);
-                    setProfile(profileData ?? null);
-                }
-            } catch (err) {
-                console.error("❌ [Auth] Excepción restaurando sesión:", err);
-            } finally {
+            if (error) {
+                console.error("❌ [Auth] Error getUser:", error.message);
                 setLoading(false);
-                initialRestoreDone.current = true; // marcar que la restauración inicial terminó
+                return;
             }
-        };
 
+            if (data?.user) {
+                setUser(data.user);
+                const profileData = await loadProfile(data.user.id);
+                setProfile(profileData ?? null);
+            }
+        } catch (err) {
+            console.error("❌ [Auth] Excepción restaurando sesión:", err);
+        } finally {
+            setLoading(false);
+            initialRestoreDone.current = true; // marcar que la restauración inicial terminó
+        }
+    };
+
+    useEffect(() => {
         restoreSession();
     }, []);
 
@@ -154,6 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!user,
         logout,
+        restoreSession
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

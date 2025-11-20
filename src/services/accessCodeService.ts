@@ -19,26 +19,31 @@ export const accessCodeService = {
             .select("*")
             .eq("code", code)
             .eq("is_used", false)
-            .single();
+            .maybeSingle();
 
         if (error) return null;
         return data;
     },
 
-    async markAsUsed(codeId: string, userId: string, email: string) {
-        const { data, error } = await supabase
+    async markAsUsed(codeId: string) {
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData?.user) return false
+
+        const { error } = await supabase
             .from("access_codes")
             .update({
                 is_used: true,
-                used_by: userId,
-                used_by_email: email,
-                used_at: new Date().toISOString()
+                used_by: userData.user.id,
+                used_by_email: userData.user.email,
+                used_at: new Date().toISOString(),
             })
-            .eq("id", codeId)
-            .select()
-            .single();
+            .eq("id", codeId);
 
-        if (error) throw error;
-        return data;
+        if (error) {
+            console.error("Error activating code:", error);
+            throw error;
+        }
+
+        return true;
     }
 }
