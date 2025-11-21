@@ -21,13 +21,6 @@ type ActivationFormData = yup.InferType<typeof schema>
 const Activate = () => {
     const { logout, restoreSession } = useAuth()
     const [loading, setLoading] = useState<boolean>(false)
-    // const [status, setStatus] = useState<{
-    //     type: 'idle' | 'error' | 'success'
-    //     message: string
-    // }>({
-    //     type: 'idle',
-    //     message: '',
-    // })
 
     const {
         register,

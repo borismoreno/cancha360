@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { AuthLayout } from "../../layouts/AuthLayout"
+import OnboardingFormLayout from "../../layouts/OnboardingFormLayout"
 import Input from "../../components/UI/Input"
 import Button from "../../components/UI/Button"
 import { useEffect } from "react"
@@ -49,7 +49,7 @@ const TournamentData = () => {
     }, [])
 
     return (
-        <AuthLayout
+        <OnboardingFormLayout
             title="Configura tu campeonato"
             subtitle="Primero, define los datos principales."
         >
@@ -105,7 +105,7 @@ const TournamentData = () => {
                     </Button>
                 </div>
             </form>
-        </AuthLayout>
+        </OnboardingFormLayout>
     )
 }
 

@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useRouteGuard } from "../hooks/useRouteGuard";
 
 // Páginas (ejemplo)
-import { Dashboard } from "../pages/Dashboard";
+import Dashboard from "../pages/Dashboard";
 import { Login } from "../pages/Login";
 import { SignUp } from "../pages/SignUp";
 import NotFound from "../pages/NotFound";

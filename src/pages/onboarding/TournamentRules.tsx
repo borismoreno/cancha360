@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { AuthLayout } from '../../layouts/AuthLayout'
 import Button from '../../components/UI/Button'
+import OnboardingFormLayout from '../../layouts/OnboardingFormLayout'
 
 const TournamentRules = () => {
     const navigate = useNavigate()
@@ -12,7 +12,7 @@ const TournamentRules = () => {
     }
 
     return (
-        <AuthLayout
+        <OnboardingFormLayout
             title="Reglas del torneo"
             subtitle="Estas reglas son estándar para el MVP y no se pueden modificar."
         >
@@ -66,7 +66,7 @@ const TournamentRules = () => {
                     </Button>
                 </div>
             </div>
-        </AuthLayout>
+        </OnboardingFormLayout>
     )
 }
 

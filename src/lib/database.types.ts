@@ -54,6 +54,7 @@ export type Database = {
           id: string
           is_used: boolean
           used_at: string | null
+          used_by: string | null
           used_by_email: string | null
         }
         Insert: {
@@ -62,6 +63,7 @@ export type Database = {
           id?: string
           is_used?: boolean
           used_at?: string | null
+          used_by?: string | null
           used_by_email?: string | null
         }
         Update: {
@@ -70,9 +72,65 @@ export type Database = {
           id?: string
           is_used?: boolean
           used_at?: string | null
+          used_by?: string | null
           used_by_email?: string | null
         }
         Relationships: []
+      }
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          local_team_id: string
+          match_order: number
+          round_id: string
+          scheduled_date: string | null
+          scheduled_time: string | null
+          visitor_team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          local_team_id: string
+          match_order: number
+          round_id: string
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          visitor_team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          local_team_id?: string
+          match_order?: number
+          round_id?: string
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          visitor_team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_local_team_id_fkey"
+            columns: ["local_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_visitor_team_id_fkey"
+            columns: ["visitor_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organizers: {
         Row: {
@@ -113,11 +171,70 @@ export type Database = {
         }
         Relationships: []
       }
+      rounds: {
+        Row: {
+          created_at: string
+          id: string
+          round_number: number
+          tournament_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          round_number: number
+          tournament_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          round_number?: number
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rounds_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          tournament_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          tournament_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
           avatar_url: string | null
           category: string | null
           created_at: string | null
+          format_type: string
           has_finished: boolean | null
           id: string
           is_active: boolean | null
@@ -126,12 +243,16 @@ export type Database = {
           notes: string | null
           organizer_id: string
           public_slug: string
+          season: string
+          team_count: number
+          tentative_start_date: string | null
           updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           category?: string | null
           created_at?: string | null
+          format_type: string
           has_finished?: boolean | null
           id?: string
           is_active?: boolean | null
@@ -140,12 +261,16 @@ export type Database = {
           notes?: string | null
           organizer_id: string
           public_slug: string
+          season: string
+          team_count: number
+          tentative_start_date?: string | null
           updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           category?: string | null
           created_at?: string | null
+          format_type?: string
           has_finished?: boolean | null
           id?: string
           is_active?: boolean | null
@@ -154,6 +279,9 @@ export type Database = {
           notes?: string | null
           organizer_id?: string
           public_slug?: string
+          season?: string
+          team_count?: number
+          tentative_start_date?: string | null
           updated_at?: string | null
         }
         Relationships: [
