@@ -2,10 +2,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { AuthLayout } from '../layouts/AuthLayout'
-import Input from '../components/UI/Input'
-import Button from '../components/UI/Button'
-import { registerOrganizer } from '../services/authService'
+import { AuthLayout } from '../../layouts/AuthLayout'
+import Input from '../../components/UI/Input'
+import Button from '../../components/UI/Button'
+import { registerOrganizer } from '../../services/authService'
 
 const schema = yup.object({
     fullName: yup.string().required('El nombre es obligatorio'),

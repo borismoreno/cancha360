@@ -1,11 +1,11 @@
-import { AuthLayout } from "../layouts/AuthLayout"
+import { AuthLayout } from "../../layouts/AuthLayout"
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import Input from "../components/UI/Input"
-import Button from "../components/UI/Button"
+import Input from "../../components/UI/Input"
+import Button from "../../components/UI/Button"
 import { Link, useNavigate } from "react-router-dom"
-import { login } from "../services/authService"
+import { login } from "../../services/authService"
 
 const schema = yup.object({
     email: yup

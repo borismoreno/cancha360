@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import Button from '../components/UI/Button'
+import { useAuth } from '../../context/AuthContext'
+import Button from '../../components/UI/Button'
 
 import {
     CalendarIcon,
@@ -11,16 +11,32 @@ import {
     LogOutIcon,
     ExternalLinkIcon,
 } from 'lucide-react'
-import { type Tournament, tournamentService } from '../services/tournamentService'
+import { type Tournament, tournamentService } from '../../services/tournamentService'
+import { showToast } from '../../utils/toast'
+import Loading from '../../components/UI/Loading'
+import { useAppDispatch } from '../../hooks/reducer'
+import { setTournament } from '../../reducers/tournamentSlice'
 
 const Dashboard = () => {
     const { logout } = useAuth()
     const navigate = useNavigate()
+    const dispatch = useAppDispatch();
     const [tournamentData, setTournamentData] = useState<Tournament>()
+    const [loading, setLoading] = useState<boolean>(false)
 
     const fetchData = async () => {
-        const response = await tournamentService.getMyTournaments()
-        if (response && response.length > 0) setTournamentData(response[0])
+        try {
+            setLoading(true)
+            const response = await tournamentService.getMyTournaments()
+            if (response && response.length > 0) {
+                dispatch(setTournament({ id: response[0].id, name: response[0].name }))
+                setTournamentData(response[0])
+            }
+        } catch (error) {
+            showToast('Ocurrió un error al cargar los datos del campeonato.', 'error')
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -31,10 +47,11 @@ const Dashboard = () => {
         await logout()
     }
 
-    if (!tournamentData) return null
+    if (!tournamentData) return <Loading fullScreen />
 
     return (
         <div className="min-h-screen bg-neutral-light">
+            {loading && <Loading fullScreen />}
             {/* Header / Navbar */}
             <header className="bg-white border-b border-neutral-medium">
                 <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
@@ -143,7 +160,7 @@ const Dashboard = () => {
                         <Button
                             variant="secondary"
                             fullWidth
-                            onClick={() => navigate('/partidos')}
+                            onClick={() => navigate(`/partidos/${tournamentData.id}`)}
                         >
                             Ver partidos
                         </Button>

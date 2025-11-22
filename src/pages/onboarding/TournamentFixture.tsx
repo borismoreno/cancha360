@@ -111,7 +111,7 @@ const TournamentFixture = () => {
                 category: tournament.category,
                 season: tournament.season,
                 teamCount: Number(tournament.numberOfTeams),
-                tentativeStartDate: tournament.startDate,
+                tentativeStartDate: tournament.startDate ? tournament.startDate : null,
                 formatType: roundType,
                 teams: teams,
                 rounds: matchdays.map((matchday) => ({
@@ -125,6 +125,8 @@ const TournamentFixture = () => {
             const response = await tournamentService.saveTournamentFull(tournamentPayload)
             if (response) {
                 showToast('¡Torneo creado exitosamente!', 'success')
+                localStorage.removeItem('tournamentTeams')
+                localStorage.removeItem('tournamentData')
                 await restoreSession()
             }
         } catch (error) {

@@ -82,31 +82,40 @@ export type Database = {
           created_at: string
           id: string
           local_team_id: string
+          local_team_score: number | null
           match_order: number
           round_id: string
           scheduled_date: string | null
           scheduled_time: string | null
+          status: string
           visitor_team_id: string
+          visitor_team_score: number | null
         }
         Insert: {
           created_at?: string
           id?: string
           local_team_id: string
+          local_team_score?: number | null
           match_order: number
           round_id: string
           scheduled_date?: string | null
           scheduled_time?: string | null
+          status?: string
           visitor_team_id: string
+          visitor_team_score?: number | null
         }
         Update: {
           created_at?: string
           id?: string
           local_team_id?: string
+          local_team_score?: number | null
           match_order?: number
           round_id?: string
           scheduled_date?: string | null
           scheduled_time?: string | null
+          status?: string
           visitor_team_id?: string
+          visitor_team_score?: number | null
         }
         Relationships: [
           {

@@ -2,9 +2,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useRouteGuard } from "../hooks/useRouteGuard";
 
 // Páginas (ejemplo)
-import Dashboard from "../pages/Dashboard";
-import { Login } from "../pages/Login";
-import { SignUp } from "../pages/SignUp";
+import Dashboard from "../pages/admin/Dashboard";
+import { Login } from "../pages/auth/Login";
+import { SignUp } from "../pages/auth/SignUp";
 import NotFound from "../pages/NotFound";
 import { SuperAdminDashboard } from "../pages/superadmin/SuperAdminDashboard";
 import AccessCodes from "../pages/superadmin/AccessCodes";
@@ -15,6 +15,8 @@ import TournamentData from "../pages/onboarding/TournamentData";
 import TournamentRules from "../pages/onboarding/TournamentRules";
 import TournamentTeams from "../pages/onboarding/TournamentTeams";
 import TournamentFixture from "../pages/onboarding/TournamentFixture";
+import Matches from "../pages/matches/Matches";
+import EditMatch from "../pages/matches/EditMatch";
 
 export const AppRouter = () => {
     const { loading } = useRouteGuard();
@@ -26,6 +28,8 @@ export const AppRouter = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/partidos/:tournamentId" element={<Matches />} />
+            <Route path="/partidos/editar/:id" element={<EditMatch />} />
             <Route path="/activacion" element={<Activate />} />
             <Route path="/solicitar-codigo" element={<Request />} />
             <Route path="/onboarding/campeonato/datos" element={<TournamentData />} />

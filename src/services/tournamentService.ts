@@ -93,7 +93,7 @@ export const tournamentService = {
         if (!userData?.user) return null;
 
         // 1. Slug generado automáticamente
-        const slug = generateTournamentSlug(name, season);
+        const slug = generateTournamentSlug(name, category, season);
 
         // ========================================================
         // 1. Insertar torneo
@@ -116,6 +116,7 @@ export const tournamentService = {
             .single();
 
         if (tError) throw tError;
+
 
         // ========================================================
         // 2. Insertar equipos
@@ -171,7 +172,7 @@ export const tournamentService = {
     }
 }
 
-function generateTournamentSlug(name: string, season: string) {
+function generateTournamentSlug(name: string, category: string, season: string) {
     return (
         name
             .toLowerCase()
@@ -181,6 +182,20 @@ function generateTournamentSlug(name: string, season: string) {
             .trim()
             .replace(/\s+/g, "_") +
         "_" +
+        category
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // remove accents
+            .replace(/[^a-z0-9\s]/g, "") // remove symbols
+            .trim()
+            .replace(/\s+/g, "_") +
+        "_" +
         season
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // remove accents
+            .replace(/[^a-z0-9\s]/g, "") // remove symbols
+            .trim()
+            .replace(/\s+/g, "_")
     );
 }

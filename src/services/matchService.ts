@@ -4,6 +4,11 @@ import type { Database } from "../lib/database.types";
 export type MatchInsert = Database["public"]["Tables"]["matches"]["Insert"]
 export type Match = Database["public"]["Tables"]["matches"]["Row"]
 
+export type MatchWithTeams = Match & {
+    local_team?: { id: string; name: string | null };
+    visitor_team?: { id: string; name: string | null };
+}
+
 export const matchService = {
     async createMatches(payload: MatchInsert[]): Promise<Match[]> {
         const { data: matchesData, error: matchError } = await supabase
@@ -12,6 +17,35 @@ export const matchService = {
             .select();
 
         if (matchError) throw matchError;
-        return matchesData
+        return matchesData ?? []
+    },
+
+    async getMatchesByRound(roundId: string): Promise<Match[]> {
+        const { data, error } = await supabase
+            .from("matches")
+            .select("*")
+            .eq("round_id", roundId)
+            .order("match_order")
+
+        if (error) throw error;
+
+        return data ?? []
+    },
+
+    async getMatchById(id: string): Promise<MatchWithTeams> {
+        const { data, error } = await supabase
+            .from("matches")
+            .select("*, local_team:local_team_id(id, name), visitor_team:visitor_team_id(id, name)")
+            .eq("id", id)
+            .single<MatchWithTeams>()
+
+        if (error) throw error;
+        if (!data) throw new Error("Partido no encontrado");
+
+        return {
+            ...data,
+            local_team: data.local_team ?? undefined,
+            visitor_team: data.visitor_team ?? undefined,
+        }
     }
 }
