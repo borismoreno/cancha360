@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -6,6 +6,8 @@ import { AuthLayout } from '../../layouts/AuthLayout'
 import Input from '../../components/UI/Input'
 import Button from '../../components/UI/Button'
 import { registerOrganizer } from '../../services/authService'
+import { showToast } from '../../utils/toast'
+import { useAuth } from '../../context/AuthContext'
 
 const schema = yup.object({
     fullName: yup.string().required('El nombre es obligatorio'),
@@ -22,7 +24,7 @@ const schema = yup.object({
 type SignUpFormData = yup.InferType<typeof schema>
 
 export const SignUp = () => {
-    const navigate = useNavigate();
+    const { restoreSession } = useAuth();
     const {
         register,
         handleSubmit,
@@ -32,17 +34,17 @@ export const SignUp = () => {
     })
     const onSubmit = async (data: SignUpFormData) => {
         try {
-            const { success, message, data: dataResponse } = await registerOrganizer({
+            const { success, message } = await registerOrganizer({
                 fullName: data.fullName,
                 email: data.email,
                 password: data.password,
                 organizationName: data.organizationName ?? null,
             });
             if (success) {
-                navigate('/dashboard')
-                console.log('response auth', dataResponse)
+                showToast('¡Cuenta creada exitosamente!', 'success')
+                await restoreSession()
             } else {
-                alert(message)
+                showToast(message, 'error')
             }
         } catch (error) {
             console.error('Error during sign up:', error)

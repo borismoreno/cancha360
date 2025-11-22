@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import Button from '../../components/UI/Button'
 
 import {
@@ -8,7 +7,6 @@ import {
     UsersIcon,
     TrophyIcon,
     SettingsIcon,
-    LogOutIcon,
     ExternalLinkIcon,
 } from 'lucide-react'
 import { type Tournament, tournamentService } from '../../services/tournamentService'
@@ -16,9 +14,9 @@ import { showToast } from '../../utils/toast'
 import Loading from '../../components/UI/Loading'
 import { useAppDispatch } from '../../hooks/reducer'
 import { setTournament } from '../../reducers/tournamentSlice'
+import ButtonSalir from '../../components/UI/ButtonSalir'
 
 const Dashboard = () => {
-    const { logout } = useAuth()
     const navigate = useNavigate()
     const dispatch = useAppDispatch();
     const [tournamentData, setTournamentData] = useState<Tournament>()
@@ -43,10 +41,6 @@ const Dashboard = () => {
         fetchData()
     }, [])
 
-    const handleLogout = async () => {
-        await logout()
-    }
-
     if (!tournamentData) return <Loading fullScreen />
 
     return (
@@ -62,13 +56,7 @@ const Dashboard = () => {
                                 {tournamentData.name}
                             </p>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 text-neutral-medium hover:text-neutral-dark transition-colors"
-                        >
-                            <LogOutIcon size={20} />
-                            <span className="text-sm font-medium">Salir</span>
-                        </button>
+                        <ButtonSalir />
                     </div>
                 </div>
             </header>

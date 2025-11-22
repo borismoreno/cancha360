@@ -4,8 +4,11 @@ import { useEffect, useState } from "react"
 import { matchService, type MatchWithTeams } from "../../services/matchService"
 import Button from "../../components/UI/Button"
 import { useAppSelector } from "../../hooks/reducer"
+import { useAppDispatch } from "../../hooks/reducer"
+import { removeEditingMatch } from "../../reducers/matchSlice"
 
 const EditMatch = () => {
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const { id } = useParams()
     const [match, setMatch] = useState<MatchWithTeams>()
@@ -63,6 +66,7 @@ const EditMatch = () => {
         navigate('/partidos')
     }
     const handleCancel = () => {
+        dispatch(removeEditingMatch())
         navigate(`/partidos/${tournament?.id}`)
     }
     const handleRegisterResult = () => {
@@ -77,7 +81,7 @@ const EditMatch = () => {
             <header className="bg-white border-b border-neutral-medium">
                 <div className="max-w-3xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
                     <button
-                        onClick={() => navigate(`/partidos/${tournament?.id}`)}
+                        onClick={handleCancel}
                         className="flex items-center gap-2 text-neutral-medium hover:text-neutral-dark transition-colors mb-4"
                     >
                         <ArrowLeftIcon size={20} />

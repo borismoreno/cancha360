@@ -6,8 +6,12 @@ import Loading from "../../components/UI/Loading"
 import { useParams } from "react-router-dom"
 import Button from "../../components/UI/Button"
 import { ArrowLeftIcon, SearchIcon } from 'lucide-react'
+import { useAppDispatch } from "../../hooks/reducer"
+import { setEditingMatch } from "../../reducers/matchSlice"
+import type { MatchWithTeams } from "../../services/matchService"
 
 const Matches = () => {
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const { tournamentId } = useParams()
     const [matchdays, setMatchdays] = useState<RoundWithMatches[]>()
@@ -186,6 +190,7 @@ const Matches = () => {
                                                 <Button
                                                     variant="secondary"
                                                     onClick={() => {
+                                                        dispatch(setEditingMatch(match))
                                                         navigate(`/partidos/editar/${match.id}`)
                                                     }}
                                                     className="whitespace-nowrap"
