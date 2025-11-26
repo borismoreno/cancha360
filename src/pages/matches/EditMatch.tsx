@@ -4,22 +4,32 @@ import { useEffect, useState } from "react"
 import { matchService, type MatchWithTeams } from "../../services/matchService"
 import Button from "../../components/UI/Button"
 import { useAppSelector } from "../../hooks/reducer"
-import { useAppDispatch } from "../../hooks/reducer"
-import { removeEditingMatch } from "../../reducers/matchSlice"
+import { showToast } from "../../utils/toast"
+import Loading from "../../components/UI/Loading"
 
 const EditMatch = () => {
-    const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const { id } = useParams()
     const [match, setMatch] = useState<MatchWithTeams>()
     const [date, setDate] = useState(match?.scheduled_date || '')
     const [time, setTime] = useState(match?.scheduled_time || '')
-    const [status, setStatus] = useState(match?.status)
+    const [status, setStatus] = useState('pending')
+    const [loading, setLoading] = useState(false)
     const { tournament } = useAppSelector(state => state.tournament)
 
     const fetchData = async () => {
-        const response = await matchService.getMatchById(id!)
-        setMatch(response);
+        try {
+            setLoading(true)
+            const response = await matchService.getMatchById(id!)
+            setMatch(response);
+            setStatus(response.status)
+            setDate(response.scheduled_date || '')
+            setTime(response.scheduled_time || '')
+        } catch (error) {
+            showToast('Ocurrió un error al cargar la información del partido.', 'error')
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -56,30 +66,42 @@ const EditMatch = () => {
         )
     }
 
-    const handleSave = () => {
-        console.log('Saving match:', {
-            id: match?.id,
-            date,
-            time,
+    const handleSave = async () => {
+        if (!match?.id) return
+
+        const payload = {
+            scheduled_date: date || null,
+            scheduled_time: time || null,
             status,
-        })
-        navigate('/partidos')
+        }
+
+        try {
+            setLoading(true)
+            const updated = await matchService.updateMatch(match.id, payload)
+            setMatch(updated)
+            showToast('Partido actualizado exitosamente.', 'success')
+            // navigate(`/partidos/${match.round_id}`)
+        } catch (error) {
+            showToast(`Error actualizando partido: ${error}`, 'error')
+        } finally {
+            setLoading(false)
+        }
     }
     const handleCancel = () => {
-        dispatch(removeEditingMatch())
         navigate(`/partidos/${tournament?.id}`)
     }
     const handleRegisterResult = () => {
-        navigate(`/partidos/resultado/${match?.id}`)
+        navigate(`/partidos/resultado/${id}`)
     }
     const canRegisterResult =
-        status === 'played' || status === 'wo' || status === 'suspended'
+        match?.status === 'played' || match?.status === 'wo' || match?.status === 'suspended'
 
     return (
         <div className="min-h-screen bg-neutral-light">
             {/* Header */}
+            {loading && <Loading fullScreen />}
             <header className="bg-white border-b border-neutral-medium">
-                <div className="max-w-3xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
                     <button
                         onClick={handleCancel}
                         className="flex items-center gap-2 text-neutral-medium hover:text-neutral-dark transition-colors mb-4"
@@ -98,7 +120,7 @@ const EditMatch = () => {
                 </div>
             </header>
             {/* Main Content */}
-            <main className="max-w-3xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
                 {/* Teams Card */}
                 <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                     <div className="flex items-center justify-between sm:justify-center gap-4">
@@ -111,120 +133,126 @@ const EditMatch = () => {
                         </span>
                     </div>
                 </div>
-                {/* Form */}
-                <div className="space-y-6">
-                    {/* A. Date and Time Section */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h3 className="text-lg font-semibold text-neutral-dark mb-4">
-                            Configuración de Fecha y Hora
-                        </h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label
-                                    htmlFor="date"
-                                    className="block text-sm font-medium text-neutral-dark mb-2"
-                                >
-                                    Fecha del partido
-                                </label>
-                                <input
-                                    type="date"
-                                    id="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-neutral-medium focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    htmlFor="time"
-                                    className="block text-sm font-medium text-neutral-dark mb-2"
-                                >
-                                    Hora del partido
-                                </label>
-                                <input
-                                    type="time"
-                                    id="time"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-neutral-medium focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    {/* B. Status Section */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h3 className="text-lg font-semibold text-neutral-dark mb-4">
-                            Estado del Partido
-                        </h3>
-                        <div>
-                            <label
-                                htmlFor="status"
-                                className="block text-sm font-medium text-neutral-dark mb-2"
-                            >
-                                Selecciona el estado
-                            </label>
-                            <select
-                                id="status"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value as string)}
-                                className="w-full px-4 py-3 rounded-lg border border-neutral-medium focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
-                            >
-                                <option value="pending">Pendiente</option>
-                                <option value="played">Jugado</option>
-                                <option value="wo">W.O. (No presentado)</option>
-                                <option value="suspended">Suspendido</option>
-                            </select>
-                            <div className="mt-3">
-                                <span className="text-sm text-neutral-medium">
-                                    Estado actual:{' '}
-                                </span>
-                                {getStatusBadge(status!)}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-6">
+                        {/* A. Date and Time Section */}
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-lg font-semibold text-neutral-dark mb-4">
+                                Configuración de Fecha y Hora
+                            </h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label
+                                        htmlFor="date"
+                                        className="block text-sm font-medium text-neutral-dark mb-2"
+                                    >
+                                        Fecha del partido
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="date"
+                                        value={date}
+                                        disabled={canRegisterResult}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-neutral-medium focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        htmlFor="time"
+                                        className="block text-sm font-medium text-neutral-dark mb-2"
+                                    >
+                                        Hora del partido
+                                    </label>
+                                    <input
+                                        type="time"
+                                        id="time"
+                                        value={time}
+                                        disabled={canRegisterResult}
+                                        onChange={(e) => setTime(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-neutral-medium focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
-                    {/* Register Result Button */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h3 className="text-lg font-semibold text-neutral-dark mb-2">
-                            Resultado del Partido
-                        </h3>
-                        <p className="text-sm text-neutral-medium mb-4">
-                            Para registrar el resultado del partido, primero guarda los
-                            cambios y luego usa el botón de abajo.
-                        </p>
-                        <Button
-                            variant="secondary"
-                            onClick={handleRegisterResult}
-                            disabled={!canRegisterResult}
-                            fullWidth
-                        >
-                            Registrar resultado
-                        </Button>
-                        {!canRegisterResult && (
-                            <p className="text-xs text-neutral-medium mt-2">
-                                El partido debe estar en estado "Jugado", "W.O." o "Suspendido"
-                                para registrar el resultado.
+                    <div className="space-y-6">
+                        {/* B. Status Section */}
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-lg font-semibold text-neutral-dark mb-4">
+                                Estado del Partido
+                            </h3>
+                            <div>
+                                <label
+                                    htmlFor="status"
+                                    className="block text-sm font-medium text-neutral-dark mb-2"
+                                >
+                                    Selecciona el estado
+                                </label>
+                                <select
+                                    id="status"
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value as string)}
+                                    className="w-full px-4 py-3 rounded-lg border border-neutral-medium focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                >
+                                    <option value="pending">Pendiente</option>
+                                    <option value="played">Jugado</option>
+                                    <option value="wo">W.O. (No presentado)</option>
+                                    <option value="suspended">Suspendido</option>
+                                </select>
+                                <div className="mt-3">
+                                    <span className="text-sm text-neutral-medium">
+                                        Estado actual:{' '}
+                                    </span>
+                                    {getStatusBadge(match?.status!)}
+                                </div>
+                            </div>
+                        </div>
+                        {/* Register Result Button */}
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-lg font-semibold text-neutral-dark mb-2">
+                                Resultado del Partido
+                            </h3>
+                            <p className="text-sm text-neutral-medium mb-4">
+                                Para registrar el resultado del partido, primero guarda los
+                                cambios y luego usa el botón de abajo.
                             </p>
-                        )}
+                            <Button
+                                variant="secondary"
+                                onClick={handleRegisterResult}
+                                disabled={!canRegisterResult}
+                                fullWidth
+                            >
+                                Registrar resultado
+                            </Button>
+                            {!canRegisterResult && (
+                                <p className="text-xs text-neutral-medium mt-2">
+                                    El partido debe estar en estado "Jugado", "W.O." o "Suspendido"
+                                    para registrar el resultado.
+                                </p>
+                            )}
+                        </div>
                     </div>
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        <Button
-                            variant="primary"
-                            onClick={handleSave}
-                            fullWidth
-                            className="order-1 sm:order-1"
-                        >
-                            Guardar cambios
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={handleCancel}
-                            fullWidth
-                            className="order-2 sm:order-2"
-                        >
-                            Cancelar
-                        </Button>
-                    </div>
+                </div>
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                    <Button
+                        variant="primary"
+                        onClick={handleSave}
+                        isLoading={loading}
+                        fullWidth
+                        className="order-1 sm:order-1"
+                    >
+                        Guardar cambios
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={handleCancel}
+                        fullWidth
+                        className="order-2 sm:order-2"
+                    >
+                        Cancelar
+                    </Button>
                 </div>
             </main>
         </div>

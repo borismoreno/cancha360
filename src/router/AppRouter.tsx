@@ -17,6 +17,7 @@ import TournamentTeams from "../pages/onboarding/TournamentTeams";
 import TournamentFixture from "../pages/onboarding/TournamentFixture";
 import Matches from "../pages/matches/Matches";
 import EditMatch from "../pages/matches/EditMatch";
+import RegisterResult from "../pages/matches/RegisterResult";
 
 export const AppRouter = () => {
     const { loading } = useRouteGuard();
@@ -30,6 +31,7 @@ export const AppRouter = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/partidos/:tournamentId" element={<Matches />} />
             <Route path="/partidos/editar/:id" element={<EditMatch />} />
+            <Route path="/partidos/resultado/:id" element={<RegisterResult />} />
             <Route path="/activacion" element={<Activate />} />
             <Route path="/solicitar-codigo" element={<Request />} />
             <Route path="/onboarding/campeonato/datos" element={<TournamentData />} />

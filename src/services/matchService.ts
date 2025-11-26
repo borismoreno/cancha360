@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabase";
 import type { Database } from "../lib/database.types";
 
 export type MatchInsert = Database["public"]["Tables"]["matches"]["Insert"]
+export type MatchUpdate = Database["public"]["Tables"]["matches"]["Update"]
 export type Match = Database["public"]["Tables"]["matches"]["Row"]
 
 export type MatchWithTeams = Match & {
@@ -41,6 +42,24 @@ export const matchService = {
 
         if (error) throw error;
         if (!data) throw new Error("Partido no encontrado");
+
+        return {
+            ...data,
+            local_team: data.local_team ?? undefined,
+            visitor_team: data.visitor_team ?? undefined,
+        }
+    },
+
+    async updateMatch(id: string, payload: MatchUpdate): Promise<MatchWithTeams> {
+        const { data, error } = await supabase
+            .from("matches")
+            .update(payload)
+            .eq("id", id)
+            .select("*, local_team:local_team_id(id, name), visitor_team:visitor_team_id(id, name)")
+            .single<MatchWithTeams>()
+
+        if (error) throw error
+        if (!data) throw new Error("Partido no encontrado")
 
         return {
             ...data,
