@@ -81,41 +81,56 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_final: boolean | null
           local_team_id: string
           local_team_score: number | null
           match_order: number
+          minutes_played: number | null
           round_id: string
           scheduled_date: string | null
           scheduled_time: string | null
           status: string
+          suspended_reason: string | null
+          updated_at: string | null
           visitor_team_id: string
           visitor_team_score: number | null
+          wo_type: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          is_final?: boolean | null
           local_team_id: string
           local_team_score?: number | null
           match_order: number
+          minutes_played?: number | null
           round_id: string
           scheduled_date?: string | null
           scheduled_time?: string | null
           status?: string
+          suspended_reason?: string | null
+          updated_at?: string | null
           visitor_team_id: string
           visitor_team_score?: number | null
+          wo_type?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          is_final?: boolean | null
           local_team_id?: string
           local_team_score?: number | null
           match_order?: number
+          minutes_played?: number | null
           round_id?: string
           scheduled_date?: string | null
           scheduled_time?: string | null
           status?: string
+          suspended_reason?: string | null
+          updated_at?: string | null
           visitor_team_id?: string
           visitor_team_score?: number | null
+          wo_type?: string | null
         }
         Relationships: [
           {
@@ -308,6 +323,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_standings: {
+        Args: { tournament_id: string }
+        Returns: {
+          drawn: number
+          goal_difference: number
+          goals_against: number
+          goals_for: number
+          lost: number
+          played: number
+          points: number
+          position: number
+          team_id: string
+          team_name: string
+          won: number
+        }[]
+      }
       is_current_user_superadmin: { Args: never; Returns: boolean }
     }
     Enums: {

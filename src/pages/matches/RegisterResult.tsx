@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { matchService, type MatchWithTeams } from "../../services/matchService"
+import { matchService, type MatchWithTeams, type MatchUpdate } from "../../services/matchService"
 import { showToast } from "../../utils/toast"
 import { ArrowLeftIcon } from 'lucide-react'
 import Button from "../../components/UI/Button"
@@ -22,6 +22,8 @@ const RegisterResult = () => {
             setLoading(true)
             const response = await matchService.getMatchById(id!)
             setMatch(response);
+            setTeam1Score(response.local_team_score ?? 0)
+            setTeam2Score(response.visitor_team_score ?? 0)
         } catch (error) {
             showToast('Ocurrió un error al cargar la información del partido.', 'error')
         } finally {
@@ -33,7 +35,35 @@ const RegisterResult = () => {
         fetchData()
     }, [])
 
-    const handleSave = () => { }
+    const handleSave = async () => {
+        if (!match?.id) return
+
+        const payload: MatchUpdate = { status: match.status }
+
+        if (match.status === 'played') {
+            payload.local_team_score = team1Score
+            payload.visitor_team_score = team2Score
+        } else if (match.status === 'wo') {
+            const woType = woTeam === 'team1' ? 'local' : woTeam === 'team2' ? 'visitor' : 'both'
+            payload.wo_type = woType
+        } else if (match.status === 'suspended') {
+            payload.suspended_reason = suspensionReason || null
+            payload.minutes_played = suspensionMinute ? parseInt(suspensionMinute) : null
+        }
+
+        try {
+            setLoading(true)
+            const updated = await matchService.updateMatch(match.id, payload)
+            setMatch(updated)
+            showToast('Resultado actualizado', 'success')
+            navigate(`/partidos/editar/${match.id}`)
+        } catch (error) {
+            console.error('Error actualizando resultado', error)
+            showToast('No se pudo actualizar el resultado', 'error')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const handleCancel = () => {
         navigate(`/partidos/editar/${id}`)

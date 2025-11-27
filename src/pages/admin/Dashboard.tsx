@@ -27,7 +27,12 @@ const Dashboard = () => {
             setLoading(true)
             const response = await tournamentService.getMyTournaments()
             if (response && response.length > 0) {
-                dispatch(setTournament({ id: response[0].id, name: response[0].name }))
+                dispatch(setTournament({
+                    id: response[0].id,
+                    name: response[0].name,
+                    category: response[0].category ?? '',
+                    season: response[0].season ?? ''
+                }))
                 setTournamentData(response[0])
             }
         } catch (error) {

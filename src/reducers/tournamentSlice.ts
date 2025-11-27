@@ -5,6 +5,8 @@ interface TournamentState {
     {
         id: string;
         name: string;
+        category: string;
+        season: string;
     } | null
 }
 
@@ -16,7 +18,7 @@ export const tournamentSlice = createSlice({
     name: 'tournament',
     initialState,
     reducers: {
-        setTournament: (state, action: PayloadAction<{ id: string, name: string }>) => {
+        setTournament: (state, action: PayloadAction<{ id: string, name: string, category: string, season: string }>) => {
             state.tournament = action.payload;
         },
         removeTournament: (state) => {

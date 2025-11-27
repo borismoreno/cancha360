@@ -18,6 +18,7 @@ import TournamentFixture from "../pages/onboarding/TournamentFixture";
 import Matches from "../pages/matches/Matches";
 import EditMatch from "../pages/matches/EditMatch";
 import RegisterResult from "../pages/matches/RegisterResult";
+import StandingsTable from "../pages/admin/StandingsTable";
 
 export const AppRouter = () => {
     const { loading } = useRouteGuard();
@@ -34,6 +35,7 @@ export const AppRouter = () => {
             <Route path="/partidos/resultado/:id" element={<RegisterResult />} />
             <Route path="/activacion" element={<Activate />} />
             <Route path="/solicitar-codigo" element={<Request />} />
+            <Route path="/tabla-de-posiciones" element={<StandingsTable />} />
             <Route path="/onboarding/campeonato/datos" element={<TournamentData />} />
             <Route path="/onboarding/campeonato/reglas" element={<TournamentRules />} />
             <Route path="/onboarding/campeonato/equipos" element={<TournamentTeams />} />
